@@ -1,0 +1,26 @@
+{
+  "name": "python",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.3.0",
+    "@codemirror/lang-markdown": "^6.2.0",
+    "@codemirror/state": "^6.3.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.21.0",
+    "github-markdown-css": "^5.2.0",
+    "markdown-it": "^13.0.1",
+    "mermaid": "^10.5.0",
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.2.3",
+    "vite": "^4.4.5"
+  }
+}
