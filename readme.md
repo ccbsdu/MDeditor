@@ -2,6 +2,22 @@
 
 一个简洁的网页版 Markdown 编辑器，基于 Vue 3 + Vite 构建，支持实时预览和格式化文本复制。
 
+## 快速开始
+
+```bash
+# 克隆项目
+git clone https://github.com/ccbsdu/MDeditor.git
+
+# 进入项目目录
+cd MDeditor
+
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+```
+
 ## 功能特性
 
 - 实时预览 Markdown 渲染效果
@@ -19,18 +35,6 @@
 - CodeMirror 6 (编辑器)
 - markdown-it (Markdown 解析)
 
-## 开发环境设置
-
-```bash
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-```
 
 ## 项目结构
 
