@@ -1,15 +1,15 @@
 <template>
   <div class="editor-container">
-    <div class="editor" ref="editorRef"></div>
+    <textarea
+      v-model="content"
+      class="editor"
+      @input="handleInput"
+    ></textarea>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { EditorState } from '@codemirror/state'
-import { EditorView, keymap } from '@codemirror/view'
-import { defaultKeymap } from '@codemirror/commands'
-import { markdown } from '@codemirror/lang-markdown'
+import { ref } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -19,28 +19,11 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
-const editorRef = ref(null)
-const editorView = ref(null)
+const content = ref(props.modelValue)
 
-onMounted(() => {
-  const state = EditorState.create({
-    doc: props.modelValue,
-    extensions: [
-      keymap.of(defaultKeymap),
-      markdown(),
-      EditorView.updateListener.of((update) => {
-        if (update.docChanged) {
-          emit('update:modelValue', update.state.doc.toString())
-        }
-      })
-    ]
-  })
-
-  editorView.value = new EditorView({
-    state,
-    parent: editorRef.value
-  })
-})
+const handleInput = (e) => {
+  emit('update:modelValue', e.target.value)
+}
 </script>
 
 <style scoped>
@@ -52,7 +35,15 @@ onMounted(() => {
 
 .editor {
   flex: 1;
-  overflow: auto;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  resize: none;
+  outline: none;
   font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: #fff;
 }
 </style>

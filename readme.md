@@ -2,6 +2,8 @@
 
 一个简洁的网页版 Markdown 编辑器，基于 Vue 3 + Vite 构建，支持实时预览和格式化文本复制。
 
+![编辑器预览](./images/screenshot.png)
+
 ## 快速开始
 
 ```bash
