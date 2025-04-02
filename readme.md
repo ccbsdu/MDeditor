@@ -17,6 +17,9 @@ cd MDeditor
 # 安装依赖
 npm install
 
+# 安装 LaTeX 支持相关依赖
+npm install katex markdown-it-texmath
+
 # 启动开发服务器
 npm run dev
 ```
@@ -50,11 +53,12 @@ npm run dev
 - **新增：文本批量搜索和替换功能**
 
 ## 技术栈
-
 - Vue 3
 - Vite
 - CodeMirror 6 (编辑器)
 - markdown-it (Markdown 解析)
+- KaTeX (LaTeX 公式渲染)
+- markdown-it-texmath (LaTeX 语法解析插件)
 
 
 ## 项目结构
@@ -114,3 +118,4 @@ MDeditor/
 - [ ] 添加自定义样式配置
 - [ ] 优化移动端适配
 - [x] 添加文本搜索和替换功能
+- [x] 添加 LaTeX 数学公式支持

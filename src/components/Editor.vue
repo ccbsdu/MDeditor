@@ -32,7 +32,9 @@
 </template>
 
 <script>
+// 移除 marked 和 katex 的导入，因为我们不在这个组件中渲染预览
 export default {
+  name: 'Editor',
   props: {
     modelValue: {
       type: String,
@@ -174,6 +176,7 @@ export default {
   border-radius: 4px;
 }
 
+/* 搜索和替换区域样式 */
 .search-replace-container {
   display: flex;
   padding: 8px;
