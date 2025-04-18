@@ -1,38 +1,56 @@
 <template>
   <div class="editor-container">
-    <!-- 添加搜索和替换功能区域 -->
-    <div class="search-replace-container">
-      <div class="search-replace-inputs">
-        <input 
-          v-model="searchText" 
-          placeholder="搜索文本" 
-          @keyup.enter="searchAndReplace(false)"
-        />
-        <input 
-          v-model="replaceText" 
-          placeholder="替换为" 
-          @keyup.enter="searchAndReplace(true)"
-        />
-      </div>
-      <div class="search-replace-buttons">
-        <button @click="searchAndReplace(false)" title="搜索">搜索</button>
-        <button @click="searchAndReplace(true)" title="替换">替换</button>
-        <button @click="replaceAll" title="全部替换">全部替换</button>
+    <div class="editor-toolbar">
+      <!-- 字体大小选择器 -->
+      <select v-model="fontSize" class="font-size-select">
+        <option value="12px">12px</option>
+        <option value="14px">14px</option>
+        <option value="16px">16px</option>
+        <option value="18px">18px</option>
+      </select>
+      
+      <!-- 格式按钮 -->
+      <button @click="insertBold" class="format-btn">加粗</button>
+      <button @click="insertItalic" class="format-btn">斜体</button>
+      <button @click="insertLink" class="format-btn">链接</button>
+      <button @click="insertImage" class="format-btn">图片</button>
+      <button @click="insertCode" class="format-btn">代码</button>
+      
+      <!-- 搜索和替换功能区域 -->
+      <div class="search-replace-container">
+        <div class="search-replace-inputs">
+          <input 
+            v-model="searchText" 
+            placeholder="搜索文本" 
+            @keyup.enter="searchAndReplace(false)"
+          />
+          <input 
+            v-model="replaceText" 
+            placeholder="替换为" 
+            @keyup.enter="searchAndReplace(true)"
+          />
+        </div>
+        <div class="search-replace-buttons">
+          <button @click="searchAndReplace(false)" title="搜索">搜索</button>
+          <button @click="searchAndReplace(true)" title="替换">替换</button>
+          <button @click="replaceAll" title="全部替换">全部替换</button>
+        </div>
       </div>
     </div>
     
+    <!-- 编辑器区域 -->
     <textarea
       ref="editorEl"
       :value="modelValue"
       @input="handleInput"
       class="editor"
       spellcheck="false"
+      :style="{ fontSize }"
     ></textarea>
   </div>
 </template>
 
 <script>
-// 移除 marked 和 katex 的导入，因为我们不在这个组件中渲染预览
 export default {
   name: 'Editor',
   props: {
@@ -43,6 +61,7 @@ export default {
   },
   data() {
     return {
+      fontSize: '14px',
       searchText: '',
       replaceText: '',
       currentSearchIndex: 0,
@@ -55,7 +74,38 @@ export default {
       this.$emit('update:modelValue', e.target.value)
     },
     
-    // 搜索和替换功能
+    // 插入格式方法
+    insertBold() {
+      this.insertText('**加粗文本**', 2, 6);
+    },
+    insertItalic() {
+      this.insertText('*斜体文本*', 1, 5);
+    },
+    insertLink() {
+      this.insertText('[链接文字](https://)', 1, 5);
+    },
+    insertImage() {
+      this.insertText('![图片描述](图片URL)', 2, 6);
+    },
+    insertCode() {
+      this.insertText('```\n代码块\n```', 3, 3);
+    },
+    insertText(text, selectionStart, selectionEnd) {
+      const editor = this.$refs.editorEl;
+      const startPos = editor.selectionStart;
+      const endPos = editor.selectionEnd;
+      const currentText = editor.value;
+      
+      editor.value = currentText.substring(0, startPos) + 
+                    text + 
+                    currentText.substring(endPos);
+      
+      editor.selectionStart = startPos + selectionStart;
+      editor.selectionEnd = startPos + selectionEnd;
+      editor.focus();
+    },
+    
+    // 搜索和替换方法
     searchAndReplace(doReplace) {
       if (!this.searchText) return;
       
@@ -120,7 +170,6 @@ export default {
       this.currentSearchIndex = (this.currentSearchIndex + 1) % this.searchResults.length;
     },
     
-    // 全部替换功能
     replaceAll() {
       if (!this.searchText) return;
       
@@ -152,10 +201,35 @@ export default {
 </script>
 
 <style scoped>
+/* 合并后的样式 */
 .editor-container {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.editor-toolbar {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  background-color: #f5f5f5;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.format-btn {
+  padding: 4px 8px;
+  background-color: #4a9eff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.font-size-select {
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
 }
 
 .editor {
@@ -176,20 +250,16 @@ export default {
   border-radius: 4px;
 }
 
-/* 搜索和替换区域样式 */
 .search-replace-container {
   display: flex;
-  padding: 8px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #ddd;
-  flex-wrap: wrap;
+  flex: 1;
+  gap: 8px;
+  margin-left: auto;
 }
 
 .search-replace-inputs {
   display: flex;
-  flex: 1;
   gap: 8px;
-  margin-right: 8px;
 }
 
 .search-replace-inputs input {
@@ -215,18 +285,14 @@ export default {
   font-size: 14px;
 }
 
-.search-replace-buttons button:hover {
-  background-color: #3a8eef;
-}
-
 @media (max-width: 768px) {
-  .search-replace-container {
+  .editor-toolbar {
     flex-direction: column;
   }
   
-  .search-replace-inputs {
-    margin-right: 0;
-    margin-bottom: 8px;
+  .search-replace-container {
+    margin-left: 0;
+    width: 100%;
   }
 }
 </style>
