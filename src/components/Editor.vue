@@ -59,6 +59,12 @@ export default {
       default: ''
     }
   },
+  mounted() {
+    // 如果没有传入内容，则使用默认内容
+    if (!this.modelValue) {
+      this.$emit('update:modelValue', this.defaultContent);
+    }
+  },
   data() {
     return {
       fontSize: '14px',
@@ -66,7 +72,56 @@ export default {
       replaceText: '',
       currentSearchIndex: 0,
       searchResults: [],
-      lastSearchText: ''
+      lastSearchText: '',
+      defaultContent: '# 欢迎使用 Markdown 编辑器\n\n' +
+        '## 基本语法示例\n\n' +
+        '### 文本格式\n' +
+        '这是一个 **粗体** 和 *斜体* 的示例。\n\n' +
+        '### 列表\n' +
+        '1. 有序列表项 1\n' +
+        '2. 有序列表项 2\n' +
+        '   - 无序子列表\n' +
+        '   - 另一个子项\n\n' +
+        '### 引用\n' +
+        '> 这是一段引用文本\n\n' +
+        '### 代码\n' +
+        '```javascript\n' +
+        'console.log(\'Hello, Markdown!\');\n' +
+        '```\n\n' +
+        '### 表格\n' +
+        '| 标题 1 | 标题 2 |\n' +
+        '|--------|--------|\n' +
+        '| 单元格 1 | 单元格 2 |\n\n' +
+        '## LaTeX 公式示例\n\n' +
+        '行内公式：$E = mc^2$ 和 $\\sqrt{x^2 + y^2}$\n\n' +
+        '独立公式：\n\n' +
+        '$$\n' +
+        '\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}\n' +
+        '$$\n\n' +
+        '多行公式：\n\n' +
+        '$$\n' +
+        '\\begin{aligned}\n' +
+        'f(x) &= \\int_{-\\infty}^{\\infty} \\hat{f}(\\xi) e^{2\\pi i \\xi x} d\\xi \\\\\n' +
+        '\\hat{f}(\\xi) &= \\int_{-\\infty}^{\\infty} f(x) e^{-2\\pi i \\xi x} dx\n' +
+        '\\end{aligned}\n' +
+        '$$\n\n' +
+        '## Mermaid 流程图示例\n\n' +
+        '```mermaid\n' +
+        'graph TD\n' +
+        '    A[开始] --> B{条件判断}\n' +
+        '    B -- 是 --> C[执行操作1]\n' +
+        '    B -- 否 --> D[执行操作2]\n' +
+        '    C --> E[结束]\n' +
+        '    D --> E\n' +
+        '```\n\n' +
+        '## Mermaid 时序图示例\n\n' +
+        '```mermaid\n' +
+        'sequenceDiagram\n' +
+        '    participant Alice\n' +
+        '    participant Bob\n' +
+        '    Alice->>Bob: 你好，Bob！\n' +
+        '    Bob-->>Alice: 你好，Alice！\n' +
+        '```'
     }
   },
   methods: {

@@ -1,192 +1,168 @@
 <template>
-  <div class="container">
-    <header>
-      <h1>Markdown 编辑器</h1>
-      <div class="actions">
-        <button @click="saveContent">保存</button>
-        <button @click="loadContent">打开</button>
-        <button @click="clearContent" class="clear-btn">清空</button>
-      </div>
-    </header>
-    <div class="editor-container">
-      <div class="editor-pane">
-        <Editor v-model="content" />
-      </div>
-      <div class="preview-pane">
-        <div class="preview-header">
-          <button class="copy-btn" @click="copyPreview">复制预览内容</button>
-        </div>
-        <Preview :content="content" ref="previewRef" />
-      </div>
+  <div class="app-container">
+    <div class="editor-preview-container">
+      <Editor v-model="content" class="editor-pane" />
+      <div class="preview-pane markdown-body" ref="preview"></div>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import Editor from './components/Editor.vue'
-import Preview from './components/Preview.vue'
+<script>
+import Editor from './components/editor.vue'
+import { marked } from 'marked'
+import katex from 'katex'
+import mermaid from 'mermaid'
+import 'katex/dist/katex.min.css'
 
-const content = ref(`# 欢迎使用 Markdown 编辑器
+// 配置 mermaid
+// 修改 mermaid 配置
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'default',
+  securityLevel: 'loose'
+})
 
-## 基本语法示例
-
-### 文本格式
-这是一个 **粗体** 和 *斜体* 的示例。
-
-### 列表
-1. 有序列表项 1
-2. 有序列表项 2
-   - 无序子列表
-   - 另一个子项
-
-### 引用
-> 这是一段引用文本
-
-### 代码
-\`\`\`javascript
-console.log('Hello, Markdown!');
-\`\`\`
-
-### 表格
-| 标题 1 | 标题 2 |
-|--------|--------|
-| 单元格 1 | 单元格 2 |
-`)
-
-const saveContent = () => {
-  const blob = new Blob([content.value], { type: 'text/markdown' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'document.md'
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
-const loadContent = () => {
-  const input = document.createElement('input')
-  input.type = 'file'
-  input.accept = '.md'
-  input.onchange = (e) => {
-    const file = e.target.files[0]
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      content.value = e.target.result
+// 修改 marked 配置
+marked.setOptions({
+  renderer: new marked.Renderer(),
+  highlight: function(code, lang) {
+    if (lang === 'mermaid') {
+      return `<pre class="mermaid">${code}</pre>`
     }
-    reader.readAsText(file)
+    return code
   }
-  input.click()
-}
+})
 
-const clearContent = () => {
-  if (confirm('确定要清空编辑器内容吗？')) {
-    content.value = `# `  // 保留一个标题符号，方便用户直接开始输入
+// 自定义数学公式渲染
+const originalRenderer = new marked.Renderer()
+const renderer = {
+  paragraph(text) {
+    const pattern = /\$\$([\s\S]*?)\$\$|\$([\s\S]*?)\$/g
+    let result = text
+    let match
+
+    while ((match = pattern.exec(text)) !== null) {
+      const isBlock = !!match[1]
+      const formula = isBlock ? match[1] : match[2]
+      const rendered = katex.renderToString(formula, {
+        displayMode: isBlock,
+        throwOnError: false
+      })
+      result = result.replace(match[0], rendered)
+    }
+    return originalRenderer.paragraph(result)
   }
 }
+marked.use({ renderer })
 
-const previewRef = ref(null)
-
-const copyPreview = async () => {
-  try {
-    // 创建一个临时容器来处理格式化的内容
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = document.querySelector('.markdown-body').innerHTML
-    
-    // 创建一个新的 ClipboardItem
-    const blob = new Blob([tempDiv.innerHTML], { type: 'text/html' })
-    const data = new ClipboardItem({
-      'text/html': blob
-    })
-    
-    // 使用新的 Clipboard API 复制富文本
-    await navigator.clipboard.write([data])
-    alert('已复制格式化内容！')
-  } catch (err) {
-    // 后备方法：使用传统的 execCommand
-    const selection = window.getSelection()
-    const range = document.createRange()
-    range.selectNodeContents(document.querySelector('.markdown-body'))
-    selection.removeAllRanges()
-    selection.addRange(range)
-    try {
-      document.execCommand('copy')
-      alert('已复制格式化内容！')
-    } catch (err) {
-      alert('复制失败，请重试')
+export default {
+  name: 'App',
+  components: {
+    Editor
+  },
+  data() {
+    return {
+      content: ''
     }
-    selection.removeAllRanges()
+  },
+  watch: {
+    content: {
+      handler(val) {
+        this.$nextTick(() => {
+          if (this.$refs.preview) {
+            this.$refs.preview.innerHTML = marked(val)
+            this.renderMermaid()
+          }
+        })
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    renderMermaid() {
+      const elements = this.$refs.preview.getElementsByClassName('mermaid')
+      Array.from(elements).forEach(element => {
+        if (!element.hasAttribute('data-processed')) {
+          try {
+            const id = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+            mermaid.render(id, element.textContent).then(({ svg }) => {
+              element.innerHTML = svg
+              element.setAttribute('data-processed', 'true')
+            })
+          } catch (error) {
+            console.error('Mermaid rendering failed:', error)
+          }
+        }
+      })
+    }
   }
 }
 </script>
 
 <style>
-.container {
+.app-container {
   height: 100vh;
+  padding: 20px;
+}
+
+.editor-preview-container {
   display: flex;
-  flex-direction: column;
-}
-
-header {
-  padding: 1rem;
-  background: #f5f5f5;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.actions button {
-  margin-left: 10px;
-  padding: 8px 16px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.actions button:hover {
-  background: #45a049;
-}
-
-.editor-container {
-  flex: 1;
-  display: flex;
-}
-
-.editor-pane, .preview-pane {
-  flex: 1;
-  overflow: hidden;
-  padding: 1rem;
+  gap: 20px;
+  height: 100%;
 }
 
 .editor-pane {
-  border-right: 1px solid #ddd;
+  flex: 1;
+  height: 100%;
 }
 
-.preview-header {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-}
-
-.copy-btn {
-  padding: 6px 12px;
-  background: #4CAF50;
-  color: white;
-  border: none;
+.preview-pane {
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  cursor: pointer;
+  background-color: #fff;
 }
 
-.copy-btn:hover {
-  background: #45a049;
+/* 添加一些基础的 Markdown 样式 */
+.markdown-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  word-wrap: break-word;
 }
 
-.clear-btn {
-  background: #ff4444 !important;
+.markdown-body pre {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  padding: 16px;
+  overflow: auto;
 }
 
-.clear-btn:hover {
-  background: #cc0000 !important;
+.markdown-body code {
+  background-color: rgba(27,31,35,0.05);
+  border-radius: 3px;
+  padding: 0.2em 0.4em;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 添加 KaTeX 相关样式 */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1em 0;
+}
+
+/* 添加 Mermaid 相关样式 */
+.mermaid {
+  text-align: center;
+  margin: 1em 0;
 }
 </style>

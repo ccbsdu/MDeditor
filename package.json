@@ -17,12 +17,14 @@
     "@codemirror/view": "^6.36.4",
     "codemirror": "^5.65.18",
     "github-markdown-css": "^5.2.0",
-    "katex": "^0.16.21",
+    "katex": "^0.16.22",
     "markdown-it": "^13.0.2",
     "markdown-it-katex": "^2.0.3",
     "markdown-it-texmath": "^1.0.0",
-    "marked": "^15.0.7",
-    "mermaid": "^10.5.0",
+    "marked": "^4.2.12",
+    "marked-katex-extension": "^5.1.4",
+    "marked-mermaid": "^0.1.0",
+    "mermaid": "^10.9.3",
     "vue": "^3.3.4"
   },
   "devDependencies": {
