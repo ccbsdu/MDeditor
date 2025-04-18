@@ -70,7 +70,7 @@ sequenceDiagram
     Alice->>Bob: 你好，Bob！
     Bob-->>Alice: 你好，Alice！
 ```
- ```
+
 
 ### 编辑器功能
 - 格式化工具栏 ：快速插入常用的 Markdown 语法
