@@ -3,7 +3,7 @@
 
 一个功能强大的 Markdown 编辑器，支持实时预览、LaTeX 公式和 Mermaid 图表。
 
-![编辑器界面预览](./screenshots/editor-interface.png)
+![编辑器界面预览](./images/editor-interface.png)
 
 ## 功能特点
 
@@ -40,7 +40,11 @@ $$
 
 ### LaTeX 公式支持
 
-![LaTeX公式示例](./screenshots/latex-preview.png)
+![LaTeX公式示例](./images/latex-preview.png)
+
+### Mermaid 图表支持
+
+![Mermaid图表示例](./images/mermaid-preview.png)
 
 ### Mermaid 图表
 流程图：
@@ -91,7 +95,7 @@ MDeditor/
 │   ├── App.vue             # 主应用组件
 │   └── main.js            # 入口文件
 ├── public/
-├── screenshots/           # 项目截图
+├── images/               # 项目截图
 └── package.json
  ```
 
