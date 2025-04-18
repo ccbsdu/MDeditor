@@ -3,7 +3,7 @@
 
 一个功能强大的 Markdown 编辑器，支持实时预览、LaTeX 公式和 Mermaid 图表。
 
-![编辑器界面预览](./screenshots/editor-preview.png)
+![编辑器界面预览](./screenshots/editor-interface.png)
 
 ## 功能特点
 
@@ -37,7 +37,10 @@ $$
 \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
 $$
  ```
-```
+
+### LaTeX 公式支持
+
+![LaTeX公式示例](./screenshots/latex-preview.png)
 
 ### Mermaid 图表
 流程图：
